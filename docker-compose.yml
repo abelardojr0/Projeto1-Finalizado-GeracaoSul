@@ -1,0 +1,36 @@
+services:
+  barbearia-db:
+    image: mysql:8.4
+    container_name: barbearia-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: alberto
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: barbearia-banco
+    
+    volumes:
+      - meus_dados:/var/lib/mysql
+      - ./database/db_barbershop.sql:/docker-entrypoint-initdb.d/db_barbershop.sql:ro
+    ports:
+      - "3306:3306"
+
+  barbearia-api:
+    build: ./backend
+    image: barbershop-imagem
+    container_name: barbershop-container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - barbearia-db
+  
+  barbearia-telinha:
+    build: ./frontend
+    image: barbershop-imagem-front
+    container_name: barbershop-container-front
+    ports:
+      - "5173:5173"
+    depends_on:
+      - barbearia-api
+
+volumes:
+  meus_dados:
